@@ -1,4 +1,3 @@
-// /api/notices/route.ts
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import Notice from "@/lib/notice.model";
@@ -45,6 +44,9 @@ export async function POST(req: Request) {
       position,
       publishDate,
       body: noticeBody,
+
+      // ✅ IMPORTANT
+      status: "unpublished",
     });
 
     return NextResponse.json(

@@ -12,7 +12,7 @@ export interface Notice {
     fileName: string;
     fileUrl: string;
   }[];
-  status: "Published" | "Draft";
+  status: "published" | "unpublished";
   createdAt: string;
   updatedAt: string;
 }

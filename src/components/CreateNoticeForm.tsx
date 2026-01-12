@@ -1,140 +1,313 @@
 "use client";
 
-import { Calendar, Upload, X } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
+import SuccessModal from "./SuccessModal";
+import uploadIcon from "../../public/icon/upload.svg";
+import attachmentIcon from "../../public/icon/attachment.svg";
+import { X } from "lucide-react";
+
+interface NoticeForm {
+  title: string;
+  noticeType: string;
+  department: string;
+  employeeId: string;
+  employeeName: string;
+  position: string;
+  publishDate: string;
+  body: string;
+}
 
 export default function CreateNoticeForm() {
+  const [form, setForm] = useState<NoticeForm>({
+    title: "",
+    noticeType: "",
+    department: "",
+    employeeId: "",
+    employeeName: "",
+    position: "",
+    publishDate: "",
+    body: "",
+  });
+
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const submitHandler = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    const requiredFields = [
+      "title",
+      "noticeType",
+      "department",
+      "employeeId",
+      "employeeName",
+      "position",
+      "publishDate",
+    ];
+
+    for (const field of requiredFields) {
+      if (!form[field as keyof NoticeForm]) {
+        setError("All required fields must be filled");
+        return;
+      }
+    }
+
+    try {
+      const res = await fetch("/api/notices", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) throw new Error("Failed to create notice");
+
+      setSuccess(true);
+      setForm({
+        title: "",
+        noticeType: "",
+        department: "",
+        employeeId: "",
+        employeeName: "",
+        position: "",
+        publishDate: "",
+        body: "",
+      });
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    }
+  };
+
   return (
-    <div className="bg-white rounded-xl border">
-      {/* Section Header */}
-      <div className="px-6 py-4 border-b bg-gray-50 rounded-t-xl">
-        <h2 className="text-sm font-medium text-gray-700">
-          Please fill in the details below
-        </h2>
-      </div>
-
-      {/* Form Body */}
-      <div className="p-6 space-y-6">
-        {/* Target */}
-        <div>
-          <label className="label">
-            Target Department(s) or Individual <span className="text-red-500">*</span>
-          </label>
-          <select className="input">
-            <option>Individual</option>
-            <option>Department</option>
-            <option>All</option>
-          </select>
+    <>
+      <form
+        onSubmit={submitHandler}
+        className="bg-white rounded-xl border border-gray-300"
+      >
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-gray-300 bg-gray-50 rounded-t-xl">
+          <h2 className="text-sm font-medium text-gray-700">
+            Please fill in the details below
+          </h2>
         </div>
 
-        {/* Notice Title */}
-        <div>
-          <label className="label">
-            Notice Title <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            placeholder="Write the Title of Notice"
-            className="input"
-          />
-        </div>
+        {error && <p className="text-red-500 mb-3">{error}</p>}
 
-        {/* Employee Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="label">
-              Select Employee ID <span className="text-red-500">*</span>
+        <div className="space-y-6 p-6">
+          {/* Target */}
+          <div className="rounded-lg bg-[#f5f6fa] p-4 border">
+            <label className="block text-sm font-semibold mb-2">
+              <span className="text-red-500">*</span> Target Department / Individual
             </label>
-            <select className="input">
-              <option>Select employee designation</option>
+            <select
+              name="department"
+              value={form.department}
+              onChange={handleChange}
+              className="w-full rounded-md border px-3 py-2 text-sm bg-[#f5f6fa]"
+            >
+              <option value="">Select target</option>
+              <option value="Individual">Individual</option>
+              <option value="Department">Department</option>
+              <option value="All">All</option>
             </select>
           </div>
 
+          {/* Notice Title */}
           <div>
-            <label className="label">
-              Employee Name <span className="text-red-500">*</span>
+            <label className="block text-sm font-semibold mb-2">
+              <span className="text-red-500">*</span> Notice Title
             </label>
             <input
-              type="text"
-              placeholder="Enter employee full name"
-              className="input"
+              name="title"
+              value={form.title}
+              onChange={handleChange}
+              placeholder="Write the title of the notice"
+              className="w-full rounded-md border px-3 py-2 text-sm"
             />
           </div>
 
-          <div>
-            <label className="label">
-              Position <span className="text-red-500">*</span>
-            </label>
-            <select className="input">
-              <option>Select employee department</option>
-            </select>
-          </div>
-        </div>
+          {/* Employee Info */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div>
+              <label className="block text-sm font-semibold mb-2">
+                <span className="text-red-500">*</span> Employee ID
+              </label>
+              <select
+                name="employeeId"
+                value={form.employeeId}
+                onChange={handleChange}
+                className="w-full rounded-md border px-3 py-2 text-sm"
+              >
+                <option value="">Select employee ID</option>
+                <option value="EMP-001">EMP-001</option>
+                <option value="EMP-002">EMP-002</option>
+                <option value="EMP-003">EMP-003</option>
+              </select>
+            </div>
 
-        {/* Notice Type + Date */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="label">
-              Notice Type <span className="text-red-500">*</span>
-            </label>
-            <select className="input">
-              <option>Select Notice Type</option>
-            </select>
+            <div>
+              <label className="block text-sm font-semibold mb-2">
+                <span className="text-red-500">*</span> Employee Name
+              </label>
+              <input
+                name="employeeName"
+                value={form.employeeName}
+                onChange={handleChange}
+                placeholder="Employee full name"
+                className="w-full rounded-md border px-3 py-2 text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2">
+                <span className="text-red-500">*</span> Position
+              </label>
+              <select
+                name="position"
+                value={form.position}
+                onChange={handleChange}
+                className="w-full rounded-md border px-3 py-2 text-sm"
+              >
+                <option value="">Select position</option>
+                <option value="Manager">Manager</option>
+                <option value="HR">HR</option>
+                <option value="Software Engineer">Software Engineer</option>
+                <option value="Accountant">Accountant</option>
+              </select>
+            </div>
           </div>
 
-          <div>
-            <label className="label">
-              Publish Date <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <input type="date" className="input pr-10" />
-              <Calendar
-                size={18}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+          {/* Notice Type & Date */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label className="block text-sm font-semibold mb-2">
+                <span className="text-red-500">*</span> Notice Type
+              </label>
+              <select
+                name="noticeType"
+                value={form.noticeType}
+                onChange={handleChange}
+                className="w-full rounded-md border px-3 py-2 text-sm"
+              >
+                <option value="">Select notice type</option>
+                <option value="Warning / Disciplinary">Warning / Disciplinary</option>
+                <option value="Performance Improvement">Performance Improvement</option>
+                <option value="Appreciation / Recognition">Appreciation / Recognition</option>
+                <option value="Attendance / Leave Issue">Attendance / Leave Issue</option>
+                <option value="Payroll / Compensation">Payroll / Compensation</option>
+                <option value="Contract / Role Update">Contract / Role Update</option>
+                <option value="Advisory / Personal Reminder">Advisory / Personal Reminder</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2">
+                <span className="text-red-500">*</span> Publish Date
+              </label>
+              <input
+                type="date"
+                name="publishDate"
+                value={form.publishDate}
+                onChange={handleChange}
+                className="w-full rounded-md border px-3 py-2 text-sm"
               />
             </div>
           </div>
-        </div>
 
-        {/* Notice Body */}
-        <div>
-          <label className="label">Notice Body</label>
-          <textarea
-            rows={4}
-            placeholder="Write the details about notice"
-            className="input resize-none"
-          />
-        </div>
-
-        {/* Upload */}
-        <div>
-          <label className="label">Upload Attachments (optional)</label>
-
-          <div className="border-2 border-dashed border-teal-400 rounded-lg p-6 text-center">
-            <Upload className="mx-auto text-teal-500 mb-2" />
-            <p className="text-sm text-teal-600 font-medium">
-              Upload nominee profile image or drag and drop.
-            </p>
-            <p className="text-xs text-gray-400">
-              Accepted File Type: jpg, png
-            </p>
+          {/* Notice Body */}
+          <div>
+            <label className="block text-sm font-semibold mb-2">
+              Notice Body
+            </label>
+            <textarea
+              name="body"
+              value={form.body}
+              onChange={handleChange}
+              rows={5}
+              placeholder="Write the notice details"
+              className="w-full rounded-md border px-3 py-2 text-sm resize-none"
+            />
           </div>
+          {/* Upload */}
+          <div>
+            <label className="block text-sm font-semibold mb-2">
+              Upload Attachments (optional)
+            </label>
+            <div className="border-2 border-dashed border-[#10b981] rounded-lg p-6 text-center cursor-pointer hover:bg-green-50 transition">
+              <Image
+                src={uploadIcon}
+                alt="Upload"
+                width={32}
+                height={32}
+                className="mx-auto mb-2"
+              />
+              <p className="text-sm">
+                <span className="text-[#10b981] font-medium">
+                  Upload
+                </span>{" "}
+                or drag and drop files
+              </p>
+              <p className="text-xs text-gray-400">
+                Accepted: jpg, png, pdf
+              </p>
+            </div>
+             {/* Uploaded Files */}
 
-          {/* Uploaded file preview */}
-          <div className="flex items-center gap-2 mt-3 bg-gray-100 px-3 py-2 rounded-md w-fit">
-            <span className="text-sm text-gray-600">
-              Policy_Document.pdf
-            </span>
-            <X size={14} className="cursor-pointer text-gray-400" />
+              <div
+                className="flex items-center gap-2 mt-3 bg-gray-100 px-3 py-2 rounded-full w-fit"
+              >
+                <Image
+                  src={attachmentIcon}
+                  alt="file"
+                  width={16}
+                  height={16}
+                />
+                <span className="text-sm">Policy_Document.pdf</span>
+                <X
+                  size={14}
+                  className="cursor-pointer"
+                />
+              </div>
+
           </div>
         </div>
+      </form>
+      {/* Footer */}
+      <div className="flex justify-end gap-3 px-6 py-4">
+        <button
+          type="button"
+          className="border px-4 py-2 rounded-full"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          className="border border-blue-500 text-blue-600 px-4 py-2 rounded-full"
+        >
+          Save as Draft
+        </button>
+
+        <button
+          type="submit"
+          className="bg-orange-500 text-white px-4 py-2 rounded-full"
+        >
+          Publish Notice
+        </button>
       </div>
 
-      {/* Footer Buttons */}
-      <div className="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50 rounded-b-xl">
-        <button className="btn-secondary">Cancel</button>
-        <button className="btn-outline">Save as Draft</button>
-        <button className="btn-primary">Publish Notice</button>
-      </div>
-    </div>
+      {success && <SuccessModal onClose={() => setSuccess(false)} />}
+    </>
   );
 }
+

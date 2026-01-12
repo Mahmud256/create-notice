@@ -45,13 +45,13 @@ export default function Header({
 
         {/* User Info */}
         <div className="flex items-center gap-2">
-          <Image
+          {/* <Image
             src="/avatar.png"
             alt="User Avatar"
             width={32}
             height={32}
             className="rounded-full"
-          />
+          /> */}
           <div className="text-sm leading-tight">
             <p className="font-medium text-gray-800">
               {userName}

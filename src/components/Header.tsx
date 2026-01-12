@@ -22,14 +22,28 @@ export default function Header({
     return "Good Evening";
   };
 
+  const getFormattedDate = () => {
+    return new Date().toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  const getFirstName = (name: string) => {
+    return name.trim().split(" ")[0];
+  };
+
   return (
     <header className="h-16 bg-white flex items-center justify-between px-6 mx-1">
       {/* Left Greeting */}
       <div>
-        <p className="text-sm text-gray-500">{getGreeting()}</p>
-        <h2 className="font-semibold text-gray-800">
-          {userName}
-        </h2>
+        <p className="text-lg ">
+          {getGreeting()} {getFirstName(userName)}
+        </p>
+        <p className="text-xs">
+          {getFormattedDate()}
+        </p>
       </div>
 
       {/* Right Section */}

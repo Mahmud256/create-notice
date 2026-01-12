@@ -5,8 +5,6 @@ import {
   LayoutDashboard,
   Users,
   FileText,
-  PlusSquare,
-  // Briefcase,
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -15,10 +13,10 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="h-16 flex items-center px-6">
         <Image
-            src={logo}
-            alt="User logo"
-            className=""
-          />
+          src={logo}
+          alt="User logo"
+          className=""
+        />
       </div>
 
       {/* Navigation */}
@@ -32,21 +30,32 @@ export default function Sidebar() {
         />
 
         {/* Employee Section */}
-        <SidebarSection title="Employee">
-          <SidebarItem
-            href="/employees"
-            icon={<Users size={16} />}
-            label="Employee Database"
-          />
-          <SidebarItem
-            href="/employees/create"
-            icon={<PlusSquare size={16} />}
-            label="Add New Employee"
-          />
+        <SidebarSection title="">
+          <div className="relative">
+            {/* Icon */}
+            <Users
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+            />
+
+            {/* Select */}
+            <select
+              id="noticeType"
+              name="noticeType"
+              className="w-full rounded-md border px-9 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500"
+            >
+              <option value="">Employee</option>
+              <option value="Employee Database">Employee Database</option>
+              <option value="Add New Employee">Add New Employee</option>
+              <option value="Performance Report">Performance Report</option>
+              <option value="Performance History">Performance History</option>
+            </select>
+          </div>
         </SidebarSection>
 
+
         {/* Notice Section */}
-        <SidebarSection title="Notice">
+        <SidebarSection title="">
           <SidebarItem
             href="/notices/create"
             icon={<FileText size={16} />}
@@ -80,10 +89,9 @@ function SidebarItem({
     <Link
       href={href}
       className={`flex items-center gap-2 px-3 py-2 rounded transition
-        ${
-          active
-            ? "bg-teal-50 text-teal-700 font-medium"
-            : "text-gray-600 hover:bg-gray-100"
+        ${active
+          ? "bg-teal-50 text-teal-700 font-medium"
+          : "text-gray-600 hover:bg-gray-100"
         }`}
     >
       {icon}

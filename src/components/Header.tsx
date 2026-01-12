@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import avatar from "../../public/logo/avatar.png";
 import { Bell } from "lucide-react";
 
 interface HeaderProps {
@@ -22,7 +23,7 @@ export default function Header({
   };
 
   return (
-    <header className="h-16 bg-white border-b flex items-center justify-between px-6">
+    <header className="h-16 bg-white flex items-center justify-between px-6 mx-1">
       {/* Left Greeting */}
       <div>
         <p className="text-sm text-gray-500">{getGreeting()}</p>
@@ -45,21 +46,21 @@ export default function Header({
 
         {/* User Info */}
         <div className="flex items-center gap-2">
-          {/* <Image
-            src="/avatar.png"
-            alt="User Avatar"
-            width={32}
-            height={32}
-            className="rounded-full"
-          /> */}
           <div className="text-sm leading-tight">
             <p className="font-medium text-gray-800">
               {userName}
             </p>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-400 text-right">
               {role}
             </p>
           </div>
+          <Image
+            src={avatar}
+            alt="User Avatar"
+            width={32}
+            height={32}
+            className="rounded-full"
+          />
         </div>
       </div>
     </header>

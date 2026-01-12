@@ -1,6 +1,16 @@
+import NoticeTable from "@/components/NoticeTable";
 import Link from "next/link";
 
-export default function Home() {
+
+async function getNotices() {
+  const res = await fetch("http://localhost:3000/api/notices", {
+    cache: "no-store",
+  });
+  return res.json();
+}
+
+export default async function Home() {
+  const notices = await getNotices();
   return (
     <div className="flex min-h-screen bg-gray-100">
 
@@ -9,7 +19,7 @@ export default function Home() {
 
 
         {/* Page Content */}
-        <main className="p-6">
+        <main className="">
           {/* Title + Actions */}
           <div className="flex justify-between items-center mb-4">
             <div>
@@ -34,8 +44,8 @@ export default function Home() {
           </div>
 
           {/* Table Placeholder */}
-          <div className="bg-white rounded-lg shadow p-6 text-center text-gray-400">
-            Notice Table Will Render Here
+          <div className="">
+            <NoticeTable notices={notices} />
           </div>
         </main>
       </div>

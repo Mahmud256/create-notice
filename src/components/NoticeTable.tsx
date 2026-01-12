@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { Notice } from "@/types/notice";
-import { Eye, Pencil, MoreVertical } from "lucide-react";
+import { Eye, MoreVertical } from "lucide-react";
+import mage_edit from "../../public/icon/mage_edit.svg";
 
 interface Props {
   notices: Notice[];
@@ -56,7 +58,7 @@ export default function NoticeTable({ notices }: Props) {
                 className="border-b last:border-none hover:bg-gray-50 transition"
               >
                 {/* Checkbox */}
-                <td className="px-4 py-11">
+                <td className="px-4 py-8">
                   <input type="checkbox" className="h-4 w-4 rounded" />
                 </td>
 
@@ -96,31 +98,32 @@ export default function NoticeTable({ notices }: Props) {
 
                 {/* Actions */}
                 <td className="px-4 py-4">
-                  <div className="flex justify-center items-center gap-3">
-                    {/* View */}
-                    <button className="text-gray-500 hover:text-blue-600">
-                      <Eye size={18} />
-                    </button>
+                  <div className="flex items-center gap-3">
+                    {/* Eye */}
+                    <Eye size={18} className="text-gray-500 hover:text-blue-600 cursor-pointer" />
 
-                    {/* Pencil + Toggle */}
-                    {/* Pencil + Hover Panel */}
-                    <div className="relative group">
-                      {/* Pencil Icon */}
-                      <button className="text-gray-500 hover:text-green-600">
-                        <Pencil size={18} />
-                      </button>
+                    {/* mage_edit + Hover Panel */}
+                    <div className="relative group flex flex-col items-center">
+                      {/* mage_edit Icon */}
+                      <Image
+                        src={mage_edit}
+                        alt="mage_edit"
+                        width={18}
+                        height={18}
+                        className="cursor-pointer"
+                      />
 
                       {/* Hover Panel */}
                       <div
-                        className="absolute top-full -translate-x-1/2 mr-6
-    flex items-center gap-3
-    border border-gray-300 bg-white rounded-md px-3 py-4
-    shadow-sm
-    opacity-0 pointer-events-none
-    transition
-    group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto"
+                        className="absolute top-full right-1/2 
+        flex items-center gap-4
+        border border-gray-300 bg-white rounded-md px-4 py-2
+        shadow-sm
+        opacity-0 scale-95 pointer-events-none
+        transition
+        group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto"
                       >
-                        {/* Status Text (Left) */}
+                        {/* Status Text */}
                         <span
                           className={`text-xs font-semibold ${isPublished ? "text-green-600" : "text-gray-600"
                             }`}
@@ -128,7 +131,7 @@ export default function NoticeTable({ notices }: Props) {
                           {isPublished ? "Published" : "Unpublished"}
                         </span>
 
-                        {/* Toggle (Right) */}
+                        {/* Toggle */}
                         <button
                           onClick={() => toggleStatus(n._id)}
                           className={`relative inline-flex h-5 w-10 items-center rounded-full transition ${isPublished ? "bg-green-500" : "bg-gray-300"
@@ -142,13 +145,14 @@ export default function NoticeTable({ notices }: Props) {
                       </div>
                     </div>
 
-
                     {/* More */}
-                    <button className="text-gray-500 hover:text-gray-700">
-                      <MoreVertical size={18} />
-                    </button>
+                    <MoreVertical
+                      size={18}
+                      className="text-gray-500 hover:text-gray-700 cursor-pointer"
+                    />
                   </div>
                 </td>
+
 
 
               </tr>

@@ -1,18 +1,24 @@
 import Link from "next/link";
+import Image from "next/image";
+import logo from "../../public/logo/Logo.png";
 import {
   LayoutDashboard,
   Users,
   FileText,
   PlusSquare,
-  Briefcase,
+  // Briefcase,
 } from "lucide-react";
 
 export default function Sidebar() {
   return (
-    <aside className="w-64 bg-white border-r min-h-screen hidden md:block">
+    <aside className="w-64 bg-white min-h-screen hidden md:block">
       {/* Logo */}
-      <div className="h-16 flex items-center px-6 border-b">
-        <h1 className="text-2xl font-bold text-teal-700">LOGO</h1>
+      <div className="h-16 flex items-center px-6">
+        <Image
+            src={logo}
+            alt="User logo"
+            className=""
+          />
       </div>
 
       {/* Navigation */}
@@ -42,15 +48,15 @@ export default function Sidebar() {
         {/* Notice Section */}
         <SidebarSection title="Notice">
           <SidebarItem
-            href="/notices"
+            href="/notices/create"
             icon={<FileText size={16} />}
             label="Notice Board"
           />
-          <SidebarItem
+          {/* <SidebarItem
             href="/notices/create"
             icon={<Briefcase size={16} />}
             label="Create Notice"
-          />
+          /> */}
         </SidebarSection>
       </nav>
     </aside>

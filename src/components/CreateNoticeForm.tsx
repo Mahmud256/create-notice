@@ -32,9 +32,9 @@ export default function CreateNoticeForm() {
 
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-  const [attachments, setAttachments] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const requiredFields = [
+
+  const requiredFields: (keyof NoticeForm)[] = [
     "title",
     "noticeType",
     "department",
@@ -45,7 +45,9 @@ export default function CreateNoticeForm() {
   ];
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -62,74 +64,34 @@ export default function CreateNoticeForm() {
       publishDate: "",
       body: "",
     });
-    setAttachments([]);
     setError("");
   };
 
-  const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    setAttachments((prev) => [...prev, ...Array.from(e.target.files)]);
-    e.target.value = "";
-  };
-
-  const openFileDialog = () => fileInputRef.current?.click();
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    if (e.dataTransfer.files?.length) {
-      setAttachments((prev) => [...prev, ...Array.from(e.dataTransfer.files)]);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const removeAttachment = (index: number) =>
-    setAttachments((prev) => prev.filter((_, i) => i !== index));
-
   const submitPayload = async (isDraft = false) => {
-    // Validate required fields for publish (but allow missing when saving draft)
     if (!isDraft) {
       for (const field of requiredFields) {
-        if (!form[field as keyof NoticeForm]) {
+        if (!form[field]) {
           setError("All required fields must be filled");
-          return false;
+          return;
         }
       }
     }
 
     try {
-      let res: Response;
-      if (attachments.length > 0) {
-        const formData = new FormData();
-        Object.entries(form).forEach(([k, v]) =>
-          formData.append(k, v as string)
-        );
-        formData.append("isDraft", String(isDraft));
-        attachments.forEach((file) => formData.append("attachments", file));
-        res = await fetch("/api/notices", {
-          method: "POST",
-          body: formData,
-        });
-      } else {
-        res = await fetch("/api/notices", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ ...form, isDraft }),
-        });
-      }
+      const res = await fetch("/api/notices", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...form, isDraft }),
+      });
 
-      if (!res.ok) throw new Error("Failed to create notice");
+      if (!res.ok) throw new Error("Failed");
 
       setSuccess(true);
       resetForm();
-      return true;
-    } catch (err) {
+    } catch {
       setError("Something went wrong. Please try again.");
-      return false;
     }
   };
 
@@ -151,26 +113,25 @@ export default function CreateNoticeForm() {
         className="bg-white rounded-xl border border-gray-300"
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-300 bg-gray-50 rounded-t-xl">
+        <div className="px-6 py-4 border-b bg-gray-50 rounded-t-xl">
           <h2 className="text-sm font-medium text-gray-700">
             Please fill in the details below
           </h2>
         </div>
 
-        {error && <p className="text-red-500 mb-3 px-6">{error}</p>}
+        {error && <p className="text-red-500 px-6 mt-3">{error}</p>}
 
         <div className="space-y-6 p-6">
-          {/* Target */}
-          <div className="rounded-lg bg-[#f5f6fa] p-4 border">
-            <label htmlFor="department" className="block text-sm font-semibold mb-2">
-              <span className="text-red-500">*</span> Target Department / Individual
+          {/* Department */}
+          <div className="bg-[#f5f6fa] p-4 rounded-lg border">
+            <label className="block text-sm font-semibold mb-2">
+              <span className="text-red-500">*</span> Target Department
             </label>
             <select
-              id="department"
               name="department"
               value={form.department}
               onChange={handleChange}
-              className="w-full rounded-md border px-3 py-2 text-sm bg-[#f5f6fa]"
+              className="w-full border rounded-md px-3 py-2 bg-[#f5f6fa]"
             >
               <option value="">Select target</option>
               <option value="All Department">All Department</option>
@@ -184,18 +145,17 @@ export default function CreateNoticeForm() {
             </select>
           </div>
 
-          {/* Notice Title */}
+          {/* Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-semibold mb-2">
+            <label className="block text-sm font-semibold mb-2">
               <span className="text-red-500">*</span> Notice Title
             </label>
             <input
-              id="title"
               name="title"
               value={form.title}
               onChange={handleChange}
-              placeholder="Write the title of the notice"
-              className="w-full rounded-md border px-3 py-2 text-sm"
+              className="w-full border rounded-md px-3 py-2"
+              placeholder="Notice title"
             />
           </div>
 
@@ -308,7 +268,7 @@ export default function CreateNoticeForm() {
             />
           </div>
 
-          {/* Upload */}
+          {/* Attachment (UI only) */}
           <div>
             <label className="block text-sm font-semibold mb-2">
               Upload Attachments (optional)
@@ -316,10 +276,6 @@ export default function CreateNoticeForm() {
 
             <div
               role="button"
-              tabIndex={0}
-              onClick={openFileDialog}
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
               className="border-2 border-dashed border-[#10b981] rounded-lg p-6 text-center cursor-pointer hover:bg-green-50 transition"
             >
               <Image
@@ -338,28 +294,25 @@ export default function CreateNoticeForm() {
                 type="file"
                 accept=".jpg,.png,.pdf"
                 multiple
-                onChange={handleFiles}
+
                 className="hidden"
               />
             </div>
 
             {/* Uploaded Files */}
             <div className="mt-3 space-y-2">
-              {attachments.map((file, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-full w-fit"
-                >
-                  <Image src={attachmentIcon} alt="file" width={16} height={16} />
-                  <span className="text-sm">{file.name}</span>
-                  <X size={14} className="cursor-pointer" onClick={() => removeAttachment(idx)} />
-                </div>
-              ))}
+              <div
+                className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-full w-fit"
+              >
+                <Image src={attachmentIcon} alt="file" width={16} height={16} />
+                <span className="text-sm">Policy_Document.pdf</span>
+                <X size={14} className="cursor-pointer" />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Footer (inside form so submit works) */}
+        {/* Footer */}
         <div className="flex justify-end gap-3 px-6 py-4">
           <button
             type="button"
@@ -377,7 +330,10 @@ export default function CreateNoticeForm() {
             Save as Draft
           </button>
 
-          <button type="submit" className="bg-orange-500 text-white px-4 py-2 rounded-full">
+          <button
+            type="submit"
+            className="bg-orange-500 text-white px-4 py-2 rounded-full"
+          >
             Publish Notice
           </button>
         </div>

@@ -13,6 +13,8 @@ pnpm dev
 # or
 bun dev
 ```
+Frontend: https://create-notice.vercel.app
+Backend: https://create-notice.vercel.app/api/notices
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 

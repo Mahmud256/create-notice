@@ -2,9 +2,12 @@ import NoticeTable from "@/components/NoticeTable";
 import { Notice } from "@/types/notice";
 
 async function getNotices(): Promise<Notice[]> {
-  const res = await fetch("http://localhost:3000/api/notices", {
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/notices`,
+    {
+      cache: "no-store",
+    }
+  );
   return res.json();
 }
 
